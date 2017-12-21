@@ -7,6 +7,7 @@ import xlrd
 from scrapy.http import HtmlResponse
 import pytz
 import datetime
+from scrapy_splash import SplashRequest
 
 
 class UsenSpider(scrapy.Spider):
@@ -21,22 +22,26 @@ class UsenSpider(scrapy.Spider):
     def build_forms(self):
         print('Building forms...')
         time_japan = datetime.datetime.now(tz=pytz.timezone('Asia/Tokyo'))
-        day = str(time_japan.day).zfill(2)
-        month = str(time_japan.month).zfill(2)
-        year = str(time_japan.year)
+        date = str(time_japan.year) + str(time_japan.month).zfill(2) + str(time_japan.day).zfill(2)
         hour = str(time_japan.hour)
-        min = str(time_japan.min)
+        min = str(time_japan.minute)
         band = 'A'
         chno = '06'
         npsearch = '検索'
         form = {
-            'npdate': year + month + day,
+            'npdate': date,
             'nphour': hour,
             'npmin': min,
             'band': band,
             'chno': chno,
             'npsearch': npsearch
         }
+        # form = 'npdate=' + date + '&' + \
+        #        'nphour=' + hour + '&' + \
+        #        'npmin=' + min + '&' + \
+        #        'band=' + band + '&' + \
+        #        'chno=' + chno + '&' + \
+        #        'npsearch=' + npsearch
         self.forms.append(form)
 
     def get_previous_day(self):
@@ -50,8 +55,12 @@ class UsenSpider(scrapy.Spider):
         for form in self.forms:
             yield scrapy.FormRequest.from_response(
                 response,
+                # formxpath="//input[@name='npsearch']",
                 formxpath="//form[@action='http://music.usen.com/nowplay/sound-planet/']",
                 formdata=form,
+                clickdata={
+                    "name": "npsearch",
+                    "type": "submit"},
                 callback=self.parse)
 
     def parse(self, response):
