@@ -7,7 +7,11 @@ import xlrd
 from scrapy.http import HtmlResponse
 import pytz
 import datetime
+import scrapy_splash
 from scrapy_splash import SplashRequest
+from scrapy_splash import SplashFormRequest
+import urlparse
+import json
 
 
 class UsenSpider(scrapy.Spider):
@@ -16,7 +20,25 @@ class UsenSpider(scrapy.Spider):
     def __init__(self):
         self.root_url = 'http://music.usen.com/nowplay/sound-planet/'
 
+        self.bands = [
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'
+        ]
+        self.bands = ['E', 'F', 'G']
+        self.channels = []
+        # self.channels.append(range(6, 58))
+        # self.channels.append(range(1, 73))
+        # self.channels.append(range(1, 71))
+        # self.channels.append(range(1, 66))
+        self.channels.append(range(16, 20))
+        self.channels.append([9, 22])
+        self.channels.append([36, 40])
+        # self.channels.append(range(1, 41))
+        # self.channels.append(range(1, 62))
+        # self.channels.append(range(1, 62))
+        # self.channels.append(range(1, 64))
+
         self.forms = []
+        self.tracks_now = []
         self.build_forms()
 
     def build_forms(self):
@@ -25,69 +47,76 @@ class UsenSpider(scrapy.Spider):
         date = str(time_japan.year) + str(time_japan.month).zfill(2) + str(time_japan.day).zfill(2)
         hour = str(time_japan.hour)
         min = str(time_japan.minute)
-        band = 'A'
-        chno = '06'
-        npsearch = '検索'
-        form = {
-            'npdate': date,
-            'nphour': hour,
-            'npmin': min,
-            'band': band,
-            'chno': chno,
-            'npsearch': npsearch
-        }
-        # form = 'npdate=' + date + '&' + \
-        #        'nphour=' + hour + '&' + \
-        #        'npmin=' + min + '&' + \
-        #        'band=' + band + '&' + \
-        #        'chno=' + chno + '&' + \
-        #        'npsearch=' + npsearch
-        self.forms.append(form)
-
-    def get_previous_day(self):
-        pass
+        for band in self.bands:
+            idx = self.bands.index(band)
+            for channel in self.channels[idx]:
+                chno = str(channel).zfill(2)
+                npsearch = '検索'
+                form = {
+                    'npdate': date,
+                    'nphour': hour,
+                    'npmin': min,
+                    'band': band,
+                    'chno': chno,
+                    'npsearch': npsearch
+                }
+                self.forms.append(form)
+                self.tracks_now.append(
+                    {
+                        'band': band,
+                        'chno': str(channel).zfill(2),
+                        'available': True,
+                        'tracks': list()
+                    }
+                )
 
     def start_requests(self):
-        yield scrapy.Request(url=self.root_url, callback=self.form_requests, errback=self.parse_error)
+        yield SplashRequest(
+            self.root_url,
+            self.form_requests,
+            endpoint='render.json',
+            args={
+                'wait': 5.0,
+                'har': 1,
+                'html': 1,
+            }
+        )
 
     def form_requests(self, response):
-        # TODO: Request is not totally right. Something to do with javascript?
         for form in self.forms:
-            yield scrapy.FormRequest.from_response(
+            yield SplashFormRequest.from_response(
                 response,
-                # formxpath="//input[@name='npsearch']",
                 formxpath="//form[@action='http://music.usen.com/nowplay/sound-planet/']",
                 formdata=form,
+                endpoint='render.json',
+                args={
+                    'wait': 5.0,
+                    'har': 1,
+                    'html': 1,
+                },
                 clickdata={
                     "name": "npsearch",
-                    "type": "submit"},
-                callback=self.parse)
+                    "type": "submit"
+                },
+                callback=self.parse
+            )
 
     def parse(self, response):
-        # print('Getting tracks for form request... ' + response.request.body)
-        #
-        # titles = response.css('span.track::text').extract()
-        # artists = response.css('span.artist::text').extract()
-        #
-        # for title in titles:
-        #     artist = artists[titles.index(title)].title()
-        #     title = title.title()
-        #     print('Appending Track -> ' + '"' + title + '"' + ' by ' + artist)
-        #
-        #     already_in_tracks = False
-        #     index_in_tracks = 0
-        #     for track in self.all_tracks:
-        #         if title == track[0] and artist == track[1]:
-        #             already_in_tracks = True
-        #             index_in_tracks = self.all_tracks.index(track)
-        #             break
-        #     if already_in_tracks:
-        #         self.all_tracks[index_in_tracks][2] += 1
-        #     else:
-        #         self.all_tracks.append([title, artist, 1])
-        # print('...tracks of form request [ ' + response.request.body + ' ] finished.')
-        # self.save_list()
-        pass
+        request_body = json.loads(response.request.body.decode('utf-8'))['body']
+        query = dict(urlparse.parse_qsl(urlparse.urlsplit(self.root_url[:-1] + '.html?' + request_body).query))
+        band = query['band']
+        chno = query['chno']
+        track = response.xpath(".//ul[@class='clearfix np-now']//li[@class='np03']/text()").extract_first()
+        # TODO: Here we check if we have more tracks
+        # TODO: missing than just the NOW one
+        # TODO: and append them in order
+        if track != '' and track != list():
+            for track_now in self.tracks_now:
+                if track_now['band'] == band and track_now['chno'] == chno:
+                    # TODO: Use metadata formatter here
+                    # TODO: Save all new tracks in csv here
+                    track_now['tracks'].append(track)
+                    print('Bd:' + band + ' // Ch:' + chno + ' // Track:' + track)
 
     def parse_error(self, response):
         # if response.value.response.status == 408 or response.value.response.status == 500 \
