@@ -23,19 +23,25 @@ class UsenSpider(scrapy.Spider):
         self.bands = [
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'
         ]
-        self.bands = ['E', 'F', 'G']
         self.channels = []
-        # self.channels.append(range(6, 58))
-        # self.channels.append(range(1, 73))
-        # self.channels.append(range(1, 71))
-        # self.channels.append(range(1, 66))
+        self.channels.append(range(6, 58))
+        self.channels.append(range(1, 73))
+        self.channels.append(range(1, 71))
+        self.channels.append(range(1, 66))
         self.channels.append(range(16, 20))
         self.channels.append([9, 22])
         self.channels.append([36, 40])
-        # self.channels.append(range(1, 41))
-        # self.channels.append(range(1, 62))
-        # self.channels.append(range(1, 62))
-        # self.channels.append(range(1, 64))
+        self.channels.append(range(1, 41))
+        self.channels.append(range(1, 62))
+        self.channels.append(range(1, 62))
+        self.channels.append(range(1, 64))
+
+        # DEBUG
+        # self.bands = ['E', 'F', 'G']
+        # self.channels = []
+        # self.channels.append(range(16, 20))
+        # self.channels.append([9, 22])
+        # self.channels.append([36, 40])
 
         self.forms = []
         self.tracks_now = []
@@ -109,12 +115,12 @@ class UsenSpider(scrapy.Spider):
         track = response.xpath(".//ul[@class='clearfix np-now']//li[@class='np03']/text()").extract_first()
         # TODO: Here we check if we have more tracks
         # TODO: missing than just the NOW one
-        # TODO: and append them in order
+        # TODO: and append them in order (READ LIST)
         if track != '' and track != list():
             for track_now in self.tracks_now:
                 if track_now['band'] == band and track_now['chno'] == chno:
                     # TODO: Use metadata formatter here
-                    # TODO: Save all new tracks in csv here
+                    # TODO: Save all new tracks in csv here (SAVE LIST)
                     track_now['tracks'].append(track)
                     print('Bd:' + band + ' // Ch:' + chno + ' // Track:' + track)
 
@@ -136,7 +142,14 @@ class UsenSpider(scrapy.Spider):
         #     print('There was an error of type -> ' + str(response.value.response.status))
         pass
 
+    def read_list(self):
+        # TODO: Check if folder exists (ADD TO PATH//CREATE)
+        # TODO: Check if list exists (WITH THIS DATE - UTC)
+        # TODO: Exists-> OPEN_READ // NoExists-> CREATE
+        pass
+
     def save_list(self):
+        # TODO: Write new tracks on list with UTC time of search
         # self.list_xls = xlwt.Workbook()
         # self.sheet = self.list_xls.add_sheet(self.radio_station + 'Playlist')
         # self.sheet.write(0, 0, 'Track Title')

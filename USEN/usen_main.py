@@ -28,6 +28,8 @@ usen_crawler = UsenCrawler()
 
 usen_crawler.get_current_tracks()
 
+# TODO: Implement timer to be updating data each X seconds/minutes
+
 # metadata_examples = [
 #     'あなたといきてゆく ／ ＧＬＡＹ',
 #     # OK
