@@ -6,8 +6,8 @@ def format_metadata(raw_metadata):
     separator = ' ／ '
     title = 'N/A'
     artist = 'N/A'
-    if separator in raw_metadata:
-        raw_track = raw_metadata.split(separator)
+    if separator in raw_metadata.encode('utf-8'):
+        raw_track = raw_metadata.encode('utf-8').split(separator)
         title = clean_title(unicodedata.normalize('NFKC', raw_track[0].decode('utf-8')))
         artist = clean_artist(unicodedata.normalize('NFKC', raw_track[1].decode('utf-8')))
     return title, artist
