@@ -14,26 +14,32 @@ def format_metadata(raw_metadata):
 
 
 def clean_title(title):
-    if title[-1] == ' ':
-        title = title[:-1]
-    if title[0] == '(':
-        title = title.split(')')[1][1:]
-    if 'a-FAN FAN' in title:
-        id_begin = title.find('a-FAN FAN')
-        id_end = id_begin + len('a-FAN FAN') + 3
-        title = title[:id_begin] + title[id_end:]
-    if title == 'Info':
+    if len(title) > 0:
+        if title[-1] == ' ':
+            title = title[:-1]
+        if title[0] == '(':
+            title = title.split(')')[1][1:]
+        if 'a-FAN FAN' in title:
+            id_begin = title.find('a-FAN FAN')
+            id_end = id_begin + len('a-FAN FAN') + 3
+            title = title[:id_begin] + title[id_end:]
+        if title == 'Info':
+            title = 'N/A'
+    else:
         title = 'N/A'
     return title
 
 
 def clean_artist(artist):
-    if artist[0] == ' ':
-        artist = artist[1:]
-    if 'USEN' in artist:
-        artist = artist.replace('USEN', '')
-    # if '(DJ)' in artist:
-    #     artist = artist.replace('(DJ)', '')
-    if artist == '***':
+    if len(artist) > 0:
+        if artist[0] == ' ':
+            artist = artist[1:]
+        if 'USEN' in artist:
+            artist = artist.replace('USEN', '')
+        # if '(DJ)' in artist:
+        #     artist = artist.replace('(DJ)', '')
+        if artist == '***':
+            artist = 'N/A'
+    else:
         artist = 'N/A'
     return artist
