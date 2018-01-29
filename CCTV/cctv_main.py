@@ -44,6 +44,6 @@ if args_input:
     cctv_crawler = CctvCrawler(cctv_path)
     cctv_crawler.get_current_tracks()
 else:
-    cctv_path = '/Users/felipelnv/Desktop/CCTV_Results'
+    cctv_path = '/Users/felipelnv/Desktop/CCTV_Results/'
     cctv_crawler = CctvCrawler(cctv_path)
     cctv_crawler.get_current_tracks()
