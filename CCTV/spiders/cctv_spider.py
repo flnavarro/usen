@@ -21,11 +21,7 @@ class CctvSpider(scrapy.Spider):
 
     def __init__(self, path):
         self.shows = [
-            # SHOW TITLE, URL, SINGLE SONGS SECTION
-            # es el parametro p= el que dice el número de página
-            # se cargan los resultados de la pagina (18) en json
-            # también muestra el numero total de tracks disponibles
-            ['“中国梦”主题歌曲展播', 'http://ent.cntv.cn/special/zgmgqz/', '', 'WHOLE PAGE', 1],
+            ['非常6+1', 'TOPC1451467940101208', '', '精彩看点', 14],
         ]
 
         self.formats = [
@@ -40,7 +36,44 @@ class CctvSpider(scrapy.Spider):
             },
             {
                 'url': '',
-            }
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': '',
+            },
+            {
+                'url': 'http://api.cntv.cn/lanmu/videolistByColumnId?',
+                'items': 100,
+            },
         ]
 
         self.all_shows = [
@@ -63,80 +96,67 @@ class CctvSpider(scrapy.Spider):
             ['我要上春晚', 'http://tv.cctv.com/lm/2017wyscw/', '', 'WHOLE PAGE', 1],           # OK
             ['星光大道', 'TOPC1451467630488780', 'KglXGa1D1WCZwhh4uaZ3160128', '精彩片段', 0],  # OK
             ['越战越勇', 'TOPC1451467829851129', 'A5DY1h2trsLm0RMGVjVY160206', '精彩片段', 0],  # OK
-            ['回声嘹亮', 'TOPC1451535575561597', '', '精彩看点'],
-                # # DIFFERENT!
-                # 'http://api.cntv.cn/lanmu/videolistByColumnId?'
-                # 'id=TOPC1451535575561597'
-                # '&n=20&of=fdate&'
-                # 'p=1'
-                # '&type=1&serviceId=tvcctv' # type 1 is singles
-                # # nothing if its this year
-                # '&Y=2017&M=11' # year and month
+            ['回声嘹亮', 'TOPC1451535575561597', '', '精彩看点', 14], # TODO: OK/NOPE -> FALTA IR PASANDO DE AÑO Y MES Y PAGINA
 
             # 16
             ['幸福账单', 'TOPC1451535575561597', 'd6wx82jRexn0Qx8hoLFU160126', '精彩看点', 0],  # OK
             ['黄金100秒', 'http://tv.cctv.com/lm/hj100m/videoset/', '', 'WHOLE PAGE', 1],  # OK
-            ['非常6+1', 'TOPC1451467940101208', '', '精彩看点'],
-                # DIFFERENT! Same as previous different
+            ['非常6+1', 'TOPC1451467940101208', '', '精彩看点', 14], # TODO: OK/NOPE -> FALTA IR PASANDO DE AÑO Y MES Y PAGINA
             ['综艺盛典', 'http://tv.cctv.com/lm/zysd/videoset/', '', 'WHOLE PAGE', 1],      # OK
-            # ['天天把歌唱', '?', '', 'ENTIRE SHOWS'],
+            # ['天天把歌唱', '', '', 'ENTIRE SHOWS'],
 
-            # 21
-            ['星光大道超级版', 'http://tv.cctv.com/lm/xgddcjb/video/index.shtml', '', 'WHOLE PAGE', 1], # OK
-            ['有朋远方来', 'http://tv.cctv.com/lm/ypyfl/videoset/', '', 'WHOLE PAGE', 1],                # OK
-            ['中国正在听', 'http://tv.cctv.com/lm/zgzzt/videoset/', '', 'WHOLE PAGE', 1],            # OK
-            ['完美星开幕', 'http://tv.cctv.com/lm/wmxkm/videoset/', '', 'WHOLE PAGE', 1],            # OK
-            ['巅峰音乐汇', 'http://tv.cctv.com/lm/dfyyh/videoset/', '', 'WHOLE PAGE', 2],            # OK
+            # 21 - ALL OK
+            ['星光大道超级版', 'http://tv.cctv.com/lm/xgddcjb/video/index.shtml', '', 'WHOLE PAGE', 1],
+            ['有朋远方来', 'http://tv.cctv.com/lm/ypyfl/videoset/', '', 'WHOLE PAGE', 1],
+            ['中国正在听', 'http://tv.cctv.com/lm/zgzzt/videoset/', '', 'WHOLE PAGE', 1],
+            ['完美星开幕', 'http://tv.cctv.com/lm/wmxkm/videoset/', '', 'WHOLE PAGE', 1],
+            ['巅峰音乐汇', 'http://tv.cctv.com/lm/dfyyh/videoset/', '', 'WHOLE PAGE', 2],
 
             # 26
-            ['“中国梦”主题歌曲展播', 'http://ent.cntv.cn/special/zgmgqz/', '', 'WHOLE PAGE', 1],     # NO! REVISAR
-            ['中国民歌大会第二季', '?', '', 'WHOLE PAGE'],
-            ['我和我的祖国2017', '?', '', 'WHOLE PAGE'],
-            ['2017年中秋晚会', '?', '', 'WHOLE PAGE'],
-            ['中秋特别节目', '?', '', 'WHOLE PAGE'],
+            ['“中国梦”主题歌曲展播', 'http://ent.cntv.cn/special/zgmgqz/', '', 'WHOLE PAGE', 3],     # OK
+            ['中国民歌大会第二季', 'http://tv.cctv.com/cctv3/special/2017mgdh/index.shtml', '', '视频回顾', 4], # TODO: NOPE! JAVASCRIPT PROBLEM
+            ['我和我的祖国2017', 'http://music.cctv.com/special/whwdzg2017/index.shtml', '', 'WHOLE PAGE', 5], # OK
+            ['2017年中秋晚会', 'http://tv.cctv.com/2017/09/21/VIDAuTggsVYiMmLnOgLnPKDB170921.shtml', '', '精彩看点', 6], # TODO: NOPE! JAVASCRIPT PROBLEM
+            ['中秋特别节目', 'http://tv.cctv.com/cctv3/special/2017wjymy/index.shtml', '', 'WHOLE PAGE', 1], # OK
 
-            # FROM 31 HERE...
-            ['江山如画-2017国庆音乐会', '?', '', '精彩视频'], # may work with no javascript / single page
-            ['中国梦 祖国颂2017', '?', '', '精彩视频'], # DIFFERENT V2
-            ['强军战旗红——建军90周年“心连心”赴南昌慰问演出', '?', '', '精彩视频'], # DIFFERENT V2
-            ['在党的旗帜下', '?', '', '精彩视频'], # DIFFERENT V2
-            ['守望相助草原情', '?', '', '精彩视频'], # DIFFERENT V2
+            # 31
+            ['江山如画-2017国庆音乐会', 'http://music.cctv.com/special/2017jsrh/index.shtml', '', '精彩视频', 7], # OK
+            ['中国梦 祖国颂2017', 'http://tv.cctv.com/2017/09/26/VIDAGMO9c7wSn9PNgP88nv8F170926.shtml', '', '精彩看点', 6], # TODO: NOPE! JAVASCRIPT PROBLEM
+            ['强军战旗红——建军90周年“心连心”赴南昌慰问演出', 'http://tv.cctv.com/2017/07/31/VIDAyJUXRTNc4saRFK5YLKvk170731.shtml', '', '精彩看点', 6], # TODO: NOPE! JAVASCRIPT PROBLEM
+            ['在党的旗帜下', 'http://tv.cctv.com/2017/08/01/VIDA9KMlXxaLT4axj4rOHwVO170801.shtml', '', '精彩看点', 6],  # TODO: NOPE! JAVASCRIPT PROBLEM
+            ['守望相助草原情', 'http://tv.cctv.com/2017/08/08/VIDA2ZoXCZt81FsrgXB1yi1y170808.shtml', '', '精彩看点', 6], # TODO: NOPE! JAVASCRIPT PROBLEM
 
-            ['歌声飘过90年', '?', '', 'WHOLE'], # WHOLE PAGE
-            ['唱支山歌给党听', '?', '', 'WHOLE'],
-            ['山水寄美端午情', '?', '', 'WHOLE'],
-            ['中国梦·劳动美2017', '?', '', 'WHOLE'],
-            ['2017春晚', '?', '', 'WHOLE'],
+            # 36 - ALL OK
+            ['歌声飘过90年', 'http://ent.cctv.com/special/90/01/index.shtml', '', 'WHOLE PAGE', 8],
+            ['唱支山歌给党听', 'http://music.cctv.com/special/2017czsggdt/', '', 'WHOLE PAGE', 5],
+            ['山水寄美端午情', 'http://ent.cctv.com/special/dw/index.shtml', '', 'WHOLE PAGE', 1],
+            ['中国梦·劳动美2017', 'http://ent.cctv.com/special/xlx/index.shtml', '', 'WHOLE PAGE', 5],
+            ['2017春晚', 'http://chunwan.cctv.com/', '', 'WHOLE PAGE', 9],
 
-            ['美丽中国唱起来', '?', '', 'WHOLE'], # DIFFERENT V2
-            ['启航2017', '?', '', 'WHOLE'],
-            ['我和我的祖国2016', '?', '', 'WHOLE'],
-            ['中国梦 祖国颂2016', '?', '', 'WHOLE'],
-            ['中国民歌大会第一季', '?', '', 'WHOLE'],
+            # 41
+            ['美丽中国唱起来', 'http://tv.cctv.com/2017/01/19/VIDALucOxtJEnqZCSSJtV9WP170119.shtml', '', '精彩看点', 6], # TODO: NOPE! JAVASCRIPT PROBLEM
+            ['启航2017', 'http://music.cctv.com/special/qihang2017/index.shtml', '', 'WHOLE PAGE', 7], # OK
+            ['我和我的祖国2016', 'http://music.cctv.com/special/2016gq/index.shtml', '', 'WHOLE PAGE', 7], # OK
+            ['中国梦 祖国颂2016', 'http://tv.cctv.com/cctv3/2016gqwh/db/index.shtml', '', 'WHOLE PAGE', 1], # OK
+            ['中国民歌大会第一季', 'http://tv.cctv.com/cctv3/zgmgdh/index.shtml', '', '视频回顾', 10], # OK
 
-            ['寻找刘三姐第三季', '?', '', 'WHOLE'],
-            ['心连心艺术团慰问演出', '?', '', 'WHOLE'],
-            ['伟大的旗帜', '?', '', 'WHOLE'],
-            ['中国梦·劳动美2016', '?', '', 'WHOLE'],
-            ['2016春晚', '?', '', 'WHOLE'],
+            # 46
+            # ['寻找刘三姐第三季', '', '', 'ENTIRE SHOWS'],
+            ['心连心艺术团慰问演出', 'http://tv.cntv.cn/videoset/C19548/page/1', '', '精彩片段', 13], # TODO: OK/NOPE -> FALTA NEXT PAGE
+            ['伟大的旗帜', 'http://tv.cctv.com/cctv3/wddqz/index.shtml', '', 'WHOLE PAGE', 1], # OK
+            ['中国梦·劳动美2016', 'http://tv.cctv.com/cctv3/51wh/index.shtml', '', 'WHOLE PAGE', 1], # OK
+            ['2016春晚', 'http://chunwan.cntv.cn/2016/index.shtml', '', 'WHOLE PAGE', 11], # OK
 
-            ['启航2016', '?', '', 'WHOLE'],
-            ['2015春晚', '?', '', 'WHOLE'],
-            ['胜利与和平', '?', '', 'WHOLE'],
-            ['中国好歌曲第三季', '?', '', 'WHOLE'],
-            ['中国好歌曲第二季', '?', '', 'WHOLE'],
-            ['中国好歌曲', '?', '', 'WHOLE'],
+            # 51
+            ['启航2016', 'http://ent.cntv.cn/special/qihang/2016/index.shtml', '', 'WHOLE PAGE', 5], # TODO: NOPE! JAVASCRIPT !
+            ['2015春晚', 'http://chunwan.cntv.cn/2015/', '', 'WHOLE PAGE', 1], # OK
+            ['胜利与和平', 'http://ent.cntv.cn/special/slyhp/', '', 'WHOLE PAGE', 12], # OK
+            ['中国好歌曲第三季', 'TOPC1451984949453678', 'uRiql41hi1BNW0BX3xfB160128', '精彩片段', 0], # OK
+            ['中国好歌曲第二季', 'http://tv.cctv.com/lm/zghgq2/videoset/', '', 'WHOLE PAGE', 1], # OK
+
+            # 56
+            ['中国好歌曲', 'http://tv.cntv.cn/videoset/VSET100181076033', '', '精彩片段', 13], # TODO: OK/NOPE -> FALTA NEXT PAGE
         ]
-
-        '''
-        self.root_url = 'http://api.cntv.cn/lanmu/videolistByColumnId?'
-        self.service_type = '&serviceId=tvcctv&type=1&n=18&'
-        self.json = '&t=jsonp&'
-        id = 'TOPC1451542061864640'
-        page = '1'
-        id_ELMT = 'Y2oSEQdYWBBlMZCIG7UF160128'
-        self.final_url = self.root_url + 'id=' + id + self.service_type + 'p=' + page + self.json + 'cb=setItemByidELMT' + id_ELMT
-        '''
 
         self.utc_date = ''
         self.utc_hour = ''
@@ -157,8 +177,16 @@ class CctvSpider(scrapy.Spider):
             page = str(page)
             url = url_format['url'] + 'id=' + codes[0] + url_format['service_url'] + str(url_format['items']) \
                 + '&p=' + page + url_format['json_cb'] + codes[1]
-        elif web_type == 1 or web_type == 2:
+        elif web_type == 1 or web_type == 2 or web_type == 3 or web_type == 4 or web_type == 5 or web_type == 6 \
+                or web_type == 7 or web_type == 8 or web_type == 9 or web_type == 10 or web_type == 11 \
+                or web_type == 12 or web_type == 13:
             url = codes[0]
+        elif web_type == 14:
+            page = str(page)
+            year = 2017
+            month = 12
+            url = url_format['url'] + 'id=' + codes[0] + '&n=' + str(url_format['items']) + '&of=fdate&p=' + page \
+                + '&type=1&serviceId=tvcctv' + '&Y=' + str(year) + '&M=' + str(month)
         return url
 
     def start_requests(self):
@@ -196,7 +224,10 @@ class CctvSpider(scrapy.Spider):
         json_list = json_data.get('response').get('docs')
         page_list = []
         for item in json_list:
-            title = item['videoTag'][1:-1]
+            if codes[0] != 'TOPC1451984949453678':
+                title = item['videoTag'][1:-1]
+            else:
+                title = item['videoTitle']
             artist = item['videoTitle'].split(u'：')[1]
             url = item['videoUrl']
             # yt_downloader = YoutubeDownloader()
@@ -227,12 +258,52 @@ class CctvSpider(scrapy.Spider):
                 )
 
     def parse_1(self, response, web_type):
-        titles = response.xpath(".//div[@class='image_list_box']//ul//div[@class='text']//a/text()").extract()
-        urls = response.xpath(".//div[@class='image_list_box']//ul//div[@class='text']//a/@href").extract()
+        if web_type == 1 or web_type == 2 or web_type == 11:
+            titles = response.xpath(".//div[@class='image_list_box']//ul//div[@class='text']//a/text()").extract()
+            urls = response.xpath(".//div[@class='image_list_box']//ul//div[@class='text']//a/@href").extract()
+            if web_type == 11:
+                urls_ = urls
+                urls = []
+                for url in urls_:
+                    if u'download.cntv.cn' not in url:
+                        urls.append(url)
+        elif web_type == 5:
+            titles = response.xpath(".//div[@class='image_list_box_zdy']//ul[@class='il_w120_b1 video_plus']//div[@class='text']//a/text()").extract()
+            urls = response.xpath(".//div[@class='image_list_box_zdy']//ul[@class='il_w120_b1 video_plus']//div[@class='text']//a/@href").extract()
+            len_discard = len(titles) - len(urls)
+            titles = titles[len_discard*2:]
+            urls = urls[len_discard:]
+        elif web_type == 6:
+            # TODO: Javascript problem, pestañitas
+            print('st')
+        elif web_type == 7:
+            titles = response.xpath(".//div[@class='image_list_box_zdy']//ul[@class='il_w120_b1  ']//div[@class='text']//a/text()").extract()
+            urls = response.xpath(".//div[@class='image_list_box_zdy']//ul[@class='il_w120_b1  ']//div[@class='text']//a/@href").extract()
+        elif web_type == 8:
+            titles = response.xpath(".//div[@class='image_list_box_zdy']//ul[@class='il_w120_b1 video_plus']//div[@class='text']//a/text()").extract()
+            urls = response.xpath(".//div[@class='image_list_box_zdy']//ul[@class='il_w120_b1 video_plus']//div[@class='text']//a/@href").extract()
+            titles += response.xpath(".//div[@class='image_list_box']//ul[@class='il_w120_b1 video_plus']//div[@class='text']//a/text()").extract()
+            urls += response.xpath(".//div[@class='image_list_box']//ul[@class='il_w120_b1 video_plus']//div[@class='text']//a/@href").extract()
+        elif web_type == 9:
+            titles = response.xpath(".//div[@class='chunwan16252_con03']//ul//li//div[@class='text']//a/text()").extract()
+            urls = response.xpath(".//div[@class='chunwan16252_con03']//ul//li//div[@class='text']//a/@href").extract()
+        elif web_type == 10:
+            titles = response.xpath(".//div[@class='bottom_con']//ul//li//p//a/text()").extract()
+            urls = response.xpath(".//div[@class='bottom_con']//ul//li//p//a/@href").extract()
+        elif web_type == 12:
+            titles = response.xpath(".//div[@class='box_right']//div[@class='image_lt']//div[@class='text']//a/text()").extract()
+            titles += response.xpath(".//div[@class='box_right']//div[@class='image_lt02']//div[@class='text']//a/text()").extract()
+            urls = response.xpath(".//div[@class='box_right']//div[@class='image_lt']//div[@class='text']//a/@href").extract()
+            urls += response.xpath(".//div[@class='box_right']//div[@class='image_lt02']//div[@class='text']//a/@href").extract()
+        elif web_type == 13:
+            titles = response.xpath(".//div[@class='md_bd']//div[@class='image_list']//h3//a/text()").extract()
+            urls = response.xpath(".//div[@class='md_bd']//div[@class='image_list']//h3//a/@href").extract()
+            # TODO: GO TO NEXT PAGE
         tracks = []
         for item in titles:
             if u'《' in item:
-                if web_type == 1 and u'：' in item:
+                if (web_type == 1 or web_type == 5 or web_type == 7 or web_type == 8 or web_type == 9) \
+                        and u'：' in item:
                     title = item[item.find(u'《')+1:item.find(u'》')]
                     artist = item.split(u'：')[1]
                     url = urls[titles.index(item)]
@@ -242,13 +313,93 @@ class CctvSpider(scrapy.Spider):
                     artist = item.split(u'》')[1]
                     url = urls[titles.index(item)]
                     tracks.append([title, artist, url])
+                elif web_type == 12:
+                    title = item[item.find(u'《')+1:item.find(u'》')]
+                    artist = 'N/A'
+                    url = urls[titles.index(item)]
+                    tracks.append([title, artist, url])
+
+    def parse_3(self, response, web_type):
+        titles_raw = response.xpath(".//div[@class='image_list_box']//ul//div[@class='text']//a")
+        urls = response.xpath(".//div[@class='image_list_box']//ul//div[@class='text']//a/@href").extract()
+        tracks = []
+        for item in titles_raw:
+            title_raw = item.xpath(".//text()").extract()
+            if len(title_raw) > 1:
+                if u'《' in title_raw[0]:
+                    title = title_raw[0][title_raw[0].find(u'《')+1:title_raw[0].find(u'》')]
+                    if u'：' in title_raw[1]:
+                        artist = title_raw[1].split(u'：')[1]
+                        if len(title_raw) == 3:
+                            artist += ' ' + title_raw[2]
+                        url = urls[titles_raw.index(item)]
+                        tracks.append([title, artist, url])
+
+    def parse_4(self, response, web_type):
+        # TODO: Javascript problem, the singles section is entirely depending on that (8 subsections)
+        print('sth')
 
     def parse(self, response):
         web_type = response.request.meta['web_type']
-        if web_type == 0:
-            self.parse_0(response)
-        elif web_type == 1 or web_type == 2:
+        if web_type == 0 or web_type == 14:
+            show_idx = response.request.meta['show_idx']
+            section = response.request.meta['section']
+            codes = response.request.meta['codes']
+            web_type = response.request.meta['web_type']
+            page = response.request.meta['page']
+
+            if web_type == 0:
+                json_data = json.loads(response.body[42:-2])
+                json_list = json_data.get('response').get('docs')
+            elif web_type == 14:
+                json_data = json.loads(response.body)
+                json_list = json_data.get('response').get('docs')
+            page_list = []
+            for item in json_list:
+                title = ''
+                artist = ''
+                if codes[0] == 'TOPC1451984949453678' or codes[0] == 'TOPC1451535575561597' \
+                        or codes[0] == 'TOPC1451467940101208':
+                    if u'《' in item['videoTitle']:
+                        title = item['videoTitle'][item['videoTitle'].find(u'《')+1:item['videoTitle'].find(u'》')]
+                else:
+                    title = item['videoTag'][1:-1]
+                if u'：' in item['videoTitle']:
+                    artist = item['videoTitle'].split(u'：')[1]
+                if title != '' and artist != '':
+                    url = item['videoUrl']
+                    # yt_downloader = YoutubeDownloader()
+                    # track_info = artist + ' - ' + title
+                    # yt_downloader.download(url, self.path, track_info)
+                    page_list.append([title, artist, url])
+                # TODO: Save as a file somewhere with page num - or download now
+
+            if page == 1:
+                n_items = self.formats[web_type]['items']
+                total_pages = int(ceil(float(json_data.get('response').get('numFound')) / n_items))
+                for p_idx in range(2, total_pages + 1):
+                    url = self.get_url(web_type, codes, p_idx)
+                    yield SplashRequest(
+                        url,
+                        self.parse,
+                        args={
+                            'wait': 1.0,
+                        },
+                        meta={
+                            'show_idx': show_idx,
+                            'section': section,
+                            'codes': codes,
+                            'web_type': web_type,
+                            'page': p_idx,
+                        }
+                    )
+        elif web_type == 1 or web_type == 2 or web_type == 5 or web_type == 6 or web_type == 7 or web_type == 8 \
+                or web_type == 9 or web_type == 10 or web_type == 11 or web_type == 12 or web_type == 13:
             self.parse_1(response, web_type)
+        elif web_type == 3:
+            self.parse_3(response, web_type)
+        elif web_type == 4:
+            self.parse_4(response, web_type)
 
     def read_list(self, band, chno, date):
         tracks_today = []
