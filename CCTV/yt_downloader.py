@@ -21,7 +21,7 @@ class MyLogger(object):
     def error(self, msg):
         # Print error into batch log
         # self.logger.warning('TRACK: ' + self.track_info + ' - ' + msg)
-        # print(msg)
+        print(msg)
         # Types of error
         if 'copyright' in msg:
             error_type = 'error_1'

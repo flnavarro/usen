@@ -2,10 +2,7 @@
 import xlwt, xlrd
 from xlutils.copy import copy
 import os
-# from difflib import SequenceMatcher
 import string
-# import requests
-# import discogs_client
 
 
 class Track(object):

@@ -29,31 +29,42 @@ class CctvCrawler(object):
 
 class InputParser(object):
     def __init__(self):
-        self.parser = argparse.ArgumentParser(description="Get Usen's Playlists Data")
-        self.path = ''
+        self.parser = argparse.ArgumentParser(description="Download CCTV's Tracks")
+        self.batches_path = ''
+        self.n_tracks_per_batch = 100
+        self.first_execution = False
 
     def add_arguments(self):
         self.parser.add_argument('-path', action='store', dest='path', required=True,
-                                 help='Path where lists will be stored.')
+                                 help='Path where batches will be stored.')
+        self.parser.add_argument('-n_tracks', metavar='n_tracks', type=int, required=True,
+                                 help='Number of tracks per batch.')
+        self.parser.add_argument('-first_execution', action='store_true', dest='first_execution', default=False,
+                                 help='Choose this option for the first execution of this script.')
 
     def parse_input(self):
         self.add_arguments()
         args = self.parser.parse_args()
-        self.path = args.path
+        self.batches_path = args.path
+        self.n_tracks_per_batch = args.n_tracks
+        self.first_execution = args.first_execution
 
 
-args_input = False
+args_input = True
 
 if args_input:
     input_parser = InputParser()
     input_parser.parse_input()
-    cctv_path = input_parser.path
-    cctv_crawler = CctvCrawler(cctv_path)
+    batches_path = input_parser.batches_path
+    n_tracks_per_batch = input_parser.n_tracks_per_batch
+    first_execution = input_parser.first_execution
+    cctv_crawler = CctvCrawler(batches_path, n_tracks_per_batch, first_execution)
     cctv_crawler.crawl_tracks()
+    cctv_crawler.make_batches()
 else:
-    # cctv_path = '/Users/felipelnv/Desktop/CCTV_Results/'
-    cctv_path = '/Volumes/HD2/CCTV_Results/'
-    cctv_crawler = CctvCrawler(cctv_path, n_tracks_per_batch=20, first_execution=False)
+    # batches_path = '/Users/felipelnv/Desktop/CCTV_Results/'
+    batches_path = '/Volumes/HD2/CCTV_Results/'
+    cctv_crawler = CctvCrawler(batches_path, n_tracks_per_batch=20, first_execution=False)
     # cctv_crawler.crawl_tracks()
     cctv_crawler.make_batches()
 
