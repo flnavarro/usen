@@ -9,10 +9,11 @@ import xlrd
 
 
 class Track(object):
-    def __init__(self, artist, title, url):
+    def __init__(self, artist, title, show, cctv_url):
         self.artist = artist
         self.title = title
-        self.url = url
+        self.show = show
+        self.cctv_url = cctv_url
 
 
 class BatchManager(object):
@@ -209,17 +210,20 @@ class BatchManager(object):
     def remove_batch_garbage(self):
         for file in os.listdir(self.tracks_path):
             if file.endswith('.mp4'):
-                os.remove(file)
+                os.remove(self.tracks_path + file)
 
     def make_batches(self):
         self.get_tracks_crawled()
+        self.remove_batch_garbage()
         print('Obtaining batches...')
         for show_tracks in self.tracks_dl_list:
+            show_name = self.shows[self.tracks_dl_list.index(show_tracks)][0]
+            show_path = self.batches_path + 'shows/' + show_name
             for track in show_tracks:
                 track_info = track['title'] + ' - ' + track['artist']
                 self.yt_downloader.download(track['url'], self.tracks_path, self.current_batch_log, track_info)
 
-                formatted_track = Track(track['artist'], track['title'], track['url'])
+                formatted_track = Track(track['artist'], track['title'], show_name, track['url'])
                 self.metadata.add_track(formatted_track, self.yt_downloader.file_url)
                 self.metadata.add_to_sheet()
 
@@ -234,7 +238,9 @@ class BatchManager(object):
                     if not (self.tracks_dl_list.index(show_tracks) == len(self.tracks_dl_list) - 1 and
                             show_tracks.index(track) == len(show_tracks) - 1):
                         self.create_batch()
-            show_path = self.batches_path + 'shows/' + self.shows[self.tracks_dl_list.index(show_tracks)]
-            os.remove(show_path + '/last_tracks.xls')
-            os.remove(show_path + '/tracks_to_download.xls')
-            os.rename(show_path + '/last_tracks_candidates.xls', show_path + '/last_tracks.xls')
+            if os.path.exists(show_path + '/last_tracks.xls'):
+                os.remove(show_path + '/last_tracks.xls')
+            if os.path.exists(show_path + '/tracks_to_download.xls'):
+                os.remove(show_path + '/tracks_to_download.xls')
+            if os.path.exists(show_path + '/last_tracks_candidates.xls'):
+                os.rename(show_path + '/last_tracks_candidates.xls', show_path + '/last_tracks.xls')

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import xlwt, xlrd
 from xlutils.copy import copy
 import os
@@ -8,10 +9,11 @@ import string
 
 
 class Track(object):
-    def __init__(self, artist, title, url):
+    def __init__(self, artist, title, show, cctv_url):
         self.artist = artist
         self.title = title
-        self.youtube_url = url
+        self.show = show
+        self.cctv_url = cctv_url
 
 
 class TrackMetadata(object):
@@ -35,6 +37,8 @@ class TrackMetadata(object):
         self.performers = []
         self.track_id = ''
         self.work_id = ''
+        self.show = ''
+        self.cctv_url = ''
 
 
 class MetadataManager(object):
@@ -82,6 +86,8 @@ class MetadataManager(object):
             self.sheet.write(0, 16, 'performer(s)')
             self.sheet.write(0, 17, 'track internal ID')
             self.sheet.write(0, 18, 'work internal ID')
+            self.sheet.write(0, 19, 'show')
+            self.sheet.write(0, 20, 'cctv url')
             self.row = 1
         else:
             xls = xlrd.open_workbook(self.metadata_file_path, formatting_info=True)
@@ -108,6 +114,8 @@ class MetadataManager(object):
             if track.artist is not None:
                 track.artist = string.capwords(track.artist)
                 self.metadata.artist = track.artist.encode('utf-8')
+            self.metadata.show = track.show.decode('utf-8')
+            self.metadata.cctv_url = track.cctv_url
             if self.generate_recover:
                 self.metadata.track_id = 'recover.metadata'  # mark tracks where metadata needs to be recovered
                 self.create_recover_metadata()
@@ -138,6 +146,8 @@ class MetadataManager(object):
         self.sheet.write(self.row, 16, ", ".join([str(item).decode('utf-8') for item in self.metadata.performers]))
         self.sheet.write(self.row, 17, self.metadata.track_id)  # track internal id
         self.sheet.write(self.row, 18, self.metadata.work_id)  # work internal id
+        self.sheet.write(self.row, 19, self.metadata.show)
+        self.sheet.write(self.row, 20, self.metadata.cctv_url)
 
         # Write metadata
         print('Saving metadata for this track... ')

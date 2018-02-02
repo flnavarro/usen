@@ -53,7 +53,7 @@ if args_input:
 else:
     # cctv_path = '/Users/felipelnv/Desktop/CCTV_Results/'
     cctv_path = '/Volumes/HD2/CCTV_Results/'
-    cctv_crawler = CctvCrawler(cctv_path, n_tracks_per_batch=100, first_execution=False)
+    cctv_crawler = CctvCrawler(cctv_path, n_tracks_per_batch=20, first_execution=False)
     # cctv_crawler.crawl_tracks()
     cctv_crawler.make_batches()
 
