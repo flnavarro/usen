@@ -2,6 +2,7 @@
 from yt_downloader import YoutubeDownloader
 from metadata_manager import MetadataManager
 import time
+import datetime
 import os
 import logging
 import xlwt
@@ -31,11 +32,14 @@ class BatchManager(object):
         self.tracks_path = ''
         self.date = ''
         self.date_previous_batch = ''
+        self.first_batch = True
+        self.first_batch_date = ''
+        self.first_batch_number = ''
+        self.current_batch_log = None
         self.create_batch()
 
         self.global_log = None
         self.open_global_log()
-        self.current_batch_log = None
 
         self.tracks_dl_list = []
 
@@ -102,10 +106,9 @@ class BatchManager(object):
             ['56 中国好歌曲', 'VSET100181076033', '', '精彩片段', 13, True],
         ]
 
-        self.shows = [
-            ['01 全球中文音乐榜上榜', 'TOPC1451542061864640', 'Y2oSEQdYWBBlMZCIG7UF160128', '精彩看点', 0, False],
-            ['15 回声嘹亮', 'TOPC1451535575561597', '', '精彩看点', 14, False],
-        ]
+        # self.shows = [
+        #     ['01 全球中文音乐榜上榜', 'TOPC1451542061864640', 'Y2oSEQdYWBBlMZCIG7UF160128', '精彩看点', 0, False],
+        # ]
 
     def open_global_log(self):
         # Create global log
@@ -114,10 +117,10 @@ class BatchManager(object):
         self.global_log.setLevel(logging.WARNING)
         self.global_log.addHandler(file_handler)
 
-    def open_batch_log(self):
+    def open_batch_log(self, batch_path):
         # Create batch log
-        self.current_batch_log = logging.getLogger(self.current_batch_path)
-        file_handler = logging.FileHandler(self.current_batch_path + 'batch_log.log', mode='w')
+        self.current_batch_log = logging.getLogger(batch_path)
+        file_handler = logging.FileHandler(batch_path + 'batch_log.log', mode='w')
         self.current_batch_log.setLevel(logging.WARNING)
         self.current_batch_log.addHandler(file_handler)
 
@@ -133,18 +136,18 @@ class BatchManager(object):
             self.current_batch_name = self.date + '_' + batch_number_4d
             self.current_batch_path = self.batches_path + self.current_batch_name + '/'
             self.tracks_path = self.current_batch_path + 'tracks/'
+            if self.first_batch:
+                self.first_batch_date = self.date
+                self.first_batch_number = self.current_batch_number
+                self.first_batch = False
             if not os.path.exists(self.current_batch_path):
                 os.makedirs(self.current_batch_path)
                 if not os.path.exists(self.tracks_path):
                     os.makedirs(self.tracks_path)
                 self.current_batch_size = 0
                 self.metadata.initialize(self.current_batch_path)
-                self.open_batch_log()
+                self.open_batch_log(self.current_batch_path)
                 break
-
-    def delivery_complete(self):
-        filename = self.current_batch_path + 'delivery.complete'
-        open(filename, 'w').close()
 
     def get_tracks_crawled(self):
         shows_path = self.batches_path + 'shows/'
@@ -209,26 +212,34 @@ class BatchManager(object):
                     show_tracks.append(track)
                 self.tracks_dl_list.append(show_tracks)
 
-    def remove_batch_garbage(self):
-        for file in os.listdir(self.tracks_path):
-            if file.endswith('.mp4'):
-                os.remove(self.tracks_path + file)
+    def remove_batch_garbage(self, tracks_path):
+        for file in os.listdir(tracks_path):
+            if file.endswith('.mp4') or file.endswith('.ytdl') or file.endswith('.part'):
+                os.remove(tracks_path + file)
+
+    def delivery_complete(self, batch_path):
+        recover_file = batch_path + 'recover.download'
+        if not os.path.exists(recover_file):
+            filename = batch_path + 'delivery.complete'
+            open(filename, 'w').close()
 
     def make_batches(self):
         self.get_tracks_crawled()
-        self.remove_batch_garbage()
         print('Obtaining batches...')
         for show_tracks in self.tracks_dl_list:
             show_info = self.shows[self.tracks_dl_list.index(show_tracks)]
             show_name = show_info[0]
             show_path = self.batches_path + 'shows/' + show_name
             for track in show_tracks:
-                track_info = track['title'] + ' - ' + track['artist']
-                self.yt_downloader.download(track['url'], self.tracks_path, self.current_batch_log, track_info)
+                self.yt_downloader.download(track['url'], track['title'], track['artist'],
+                                            self.tracks_path, show_name, self.current_batch_log, False)
 
-                formatted_track = Track(track['artist'], track['title'], show_name, track['url'])
-                self.metadata.add_track(formatted_track, self.yt_downloader.file_url)
-                self.metadata.add_to_sheet()
+                if not os.path.exists(self.current_batch_path + 'error.temp'):
+                    formatted_track = Track(track['artist'], track['title'], show_name, track['url'])
+                    self.metadata.add_track(formatted_track, self.yt_downloader.file_url)
+                    self.metadata.add_to_sheet()
+                else:
+                    os.remove(self.current_batch_path + 'error.temp')
 
                 self.current_batch_size += 1
 
@@ -236,8 +247,8 @@ class BatchManager(object):
                         (self.tracks_dl_list.index(show_tracks) == len(self.tracks_dl_list) - 1 and
                          show_tracks.index(track) == len(show_tracks) - 1):
                     print('Batch completed.')
-                    self.delivery_complete()
-                    self.remove_batch_garbage()
+                    self.remove_batch_garbage(self.tracks_path)
+                    self.delivery_complete(self.current_batch_path)
                     if not (self.tracks_dl_list.index(show_tracks) == len(self.tracks_dl_list) - 1 and
                             show_tracks.index(track) == len(show_tracks) - 1):
                         self.create_batch()
@@ -247,3 +258,48 @@ class BatchManager(object):
                 os.remove(show_path + '/tracks_to_download.xls')
             if os.path.exists(show_path + '/last_tracks_candidates.xls'):
                 os.rename(show_path + '/last_tracks_candidates.xls', show_path + '/last_tracks.xls')
+        self.recover_batches()
+
+    def recover_batches(self):
+        date_today = datetime.datetime.now()
+        batch_num = self.first_batch_number
+        batch_date = self.first_batch_date
+        while True:
+            batch_n_4d = str(batch_num).zfill(4)
+            batch_name = batch_date + '_' + batch_n_4d
+            batch_path = self.batches_path + batch_name + '/'
+            tracks_path = batch_path + 'tracks/'
+            if os.path.exists(batch_path):
+                recover_dl = batch_path + 'recover.download'
+                recover_file = batch_path + 'tracks_to_recover.xls'
+                if os.path.exists(recover_dl) and os.path.exists(recover_file):
+                    xls = xlrd.open_workbook(recover_file, formatting_info=True)
+                    n_rows = xls.sheet_by_index(0).nrows
+                    sheet_read = xls.sheet_by_index(0)
+                    self.open_batch_log(batch_path)
+                    self.metadata.initialize(batch_path)
+                    for row in range(1, n_rows):
+                        title = sheet_read.cell(row, 0).value
+                        artist = sheet_read.cell(row, 1).value
+                        url = sheet_read.cell(row, 2).value
+                        show = sheet_read.cell(row, 3).value
+                        self.yt_downloader.download(url, title, artist, tracks_path, show, self.current_batch_log, True)
+                        if not os.path.exists(batch_path + 'error.temp'):
+                            formatted_track = Track(title, artist, show.encode('utf-8'), url)
+                            self.metadata.add_track(formatted_track, self.yt_downloader.file_url)
+                            self.metadata.add_to_sheet()
+                        else:
+                            os.remove(batch_path + 'error.temp')
+                    os.remove(recover_dl)
+                    os.remove(recover_file)
+                    print('Batch completed.')
+                    self.remove_batch_garbage(tracks_path)
+                    self.delivery_complete(batch_path)
+                batch_num += 1
+            date = datetime.datetime(int(batch_date[:4]), int(batch_date[4:6]), int(batch_date[6:]))
+            date += datetime.timedelta(days=1)
+            if date > date_today:
+                break
+            else:
+                batch_num = 1
+                batch_date = str(date.year) + str(date.month).zfill(2) + str(date.day).zfill(2)

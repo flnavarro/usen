@@ -78,10 +78,9 @@ class CctvSpider(scrapy.Spider):
             ['56 中国好歌曲', 'VSET100181076033', '', '精彩片段', 13, True],
         ]
 
-        self.shows = [
-            ['01 全球中文音乐榜上榜', 'TOPC1451542061864640', 'Y2oSEQdYWBBlMZCIG7UF160128', '精彩看点', 0, False],
-            ['15 回声嘹亮', 'TOPC1451535575561597', '', '精彩看点', 14, False],
-        ]
+        # self.shows = [
+        #     ['29 2017年中秋晚会', 'http://tv.cctv.com/2017/09/21/VIDAuTggsVYiMmLnOgLnPKDB170921.shtml', '', '精彩看点', 6, True],
+        # ]
 
         self.first_execution = first_execution
 
@@ -248,17 +247,23 @@ class CctvSpider(scrapy.Spider):
                 title = ''
                 artist = ''
                 url = ''
+                length_h = 0
+                length_m = 0
                 if web_type == 0 or web_type == 14:
                     video_title = item['videoTitle']
                     url = item['videoUrl']
+                    length_h = int(item['videoLength'][:2])
+                    length_m = int(item['videoLength'][3:5])
                 elif web_type == 15:
                     video_title = item['t']
                     url = item['url']
+                    length_h = int(item['len'][:2])
+                    length_m = int(item['len'][3:5])
                 if u'《' in video_title and u'》' in video_title:
                     title = video_title[video_title.find(u'《') + 1:video_title.find(u'》')]
                 if u'：' in video_title:
                     artist = video_title.split(u'：')[1]
-                if title != '' and artist != '':
+                if title != '' and artist != '' and length_h == 0 and length_m < 10:
                     page_list.append({
                         'title': title,
                         'artist': artist,

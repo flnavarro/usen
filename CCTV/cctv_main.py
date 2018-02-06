@@ -62,9 +62,8 @@ if args_input:
     cctv_crawler.crawl_tracks()
     cctv_crawler.make_batches()
 else:
-    # batches_path = '/Users/felipelnv/Desktop/CCTV_Results/'
     batches_path = '/Volumes/HD2/CCTV_Results/'
-    cctv_crawler = CctvCrawler(batches_path, n_tracks_per_batch=20, first_execution=False)
-    # cctv_crawler.crawl_tracks()
+    cctv_crawler = CctvCrawler(batches_path, n_tracks_per_batch=100, first_execution=True)
+    cctv_crawler.crawl_tracks()
     cctv_crawler.make_batches()
 
