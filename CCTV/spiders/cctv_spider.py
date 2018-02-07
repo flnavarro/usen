@@ -247,23 +247,17 @@ class CctvSpider(scrapy.Spider):
                 title = ''
                 artist = ''
                 url = ''
-                length_h = 0
-                length_m = 0
                 if web_type == 0 or web_type == 14:
                     video_title = item['videoTitle']
                     url = item['videoUrl']
-                    length_h = int(item['videoLength'][:2])
-                    length_m = int(item['videoLength'][3:5])
                 elif web_type == 15:
                     video_title = item['t']
                     url = item['url']
-                    length_h = int(item['len'][:2])
-                    length_m = int(item['len'][3:5])
                 if u'《' in video_title and u'》' in video_title:
                     title = video_title[video_title.find(u'《') + 1:video_title.find(u'》')]
                 if u'：' in video_title:
                     artist = video_title.split(u'：')[1]
-                if title != '' and artist != '' and length_h == 0 and length_m < 10:
+                if title != '' and artist != '':
                     page_list.append({
                         'title': title,
                         'artist': artist,

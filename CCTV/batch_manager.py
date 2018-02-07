@@ -164,12 +164,18 @@ class BatchManager(object):
                         artist = sheet_read.cell(row, 1).value
                         url = sheet_read.cell(row, 2).value
                         dl_idx = sheet_read.cell(row, 3).value
-                        show_tracks_crawled.append({
-                            'title': title,
-                            'artist': artist,
-                            'url': url,
-                            'index': dl_idx,
-                        })
+                        already_in_list = False
+                        for track_crawled in show_tracks_crawled:
+                            if track_crawled['title'] == title and track_crawled['artist'] == artist:
+                                already_in_list = True
+                                break
+                        if not already_in_list:
+                            show_tracks_crawled.append({
+                                'title': title,
+                                'artist': artist,
+                                'url': url,
+                                'index': dl_idx,
+                            })
                 show_tracks_crawled = sorted(show_tracks_crawled,
                                              key=lambda show_tracks_crawled: show_tracks_crawled['index'])
                 last_tracks = []
