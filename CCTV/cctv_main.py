@@ -46,11 +46,13 @@ class InputParser(object):
         self.add_arguments()
         args = self.parser.parse_args()
         self.batches_path = args.path
+        if self.batches_path[:-1] != '/':
+            self.batches_path += '/'
         self.n_tracks_per_batch = args.n_tracks
         self.first_execution = args.first_execution
 
 
-args_input = False
+args_input = True
 
 if args_input:
     input_parser = InputParser()
@@ -64,6 +66,6 @@ if args_input:
 else:
     batches_path = '/Volumes/HD2/CCTV_Results/'
     cctv_crawler = CctvCrawler(batches_path, n_tracks_per_batch=100, first_execution=True)
-    # cctv_crawler.crawl_tracks()
+    cctv_crawler.crawl_tracks()
     cctv_crawler.make_batches()
 

@@ -199,16 +199,18 @@ class CctvSpider(scrapy.Spider):
             if u'《' in item and u'》' in item:
                 title = item[item.find(u'《') + 1:item.find(u'》')]
                 if (web_type == 1 or web_type == 5 or web_type == 6 or web_type == 7 or web_type == 8
-                        or web_type == 9 or web_type == 10 or web_type == 11) and u'：' in item:
-                    artist = item.split(u'：')[1]
+                        or web_type == 9 or web_type == 10) and u'演唱：' in item:
+                    artist = item.split(u'演唱：')[1]
                 elif web_type == 2:
                     artist = item.split(u'》')[1]
                 elif web_type == 3:
                     t3_id = titles.index(item)
-                    if u'：' in titles_3_raw[t3_id][1]:
-                        artist = titles_3_raw[t3_id][1].split(u'：')[1]
+                    if u'演唱：' in titles_3_raw[t3_id][1]:
+                        artist = titles_3_raw[t3_id][1].split(u'演唱：')[1]
                         if len(titles_3_raw[t3_id]) == 3:
                             artist += ' ' + titles_3_raw[t3_id][2]
+                elif web_type == 11 and u'表演者：' in item:
+                    artist = item.split(u'表演者：')[1]
                 elif web_type == 12:
                     artist = 'N/A'
                 if artist != '':
@@ -255,8 +257,8 @@ class CctvSpider(scrapy.Spider):
                     url = item['url']
                 if u'《' in video_title and u'》' in video_title:
                     title = video_title[video_title.find(u'《') + 1:video_title.find(u'》')]
-                if u'：' in video_title:
-                    artist = video_title.split(u'：')[1]
+                if u'演唱：' in video_title:
+                    artist = video_title.split(u'演唱：')[1]
                 if title != '' and artist != '':
                     page_list.append({
                         'title': title,
@@ -315,8 +317,8 @@ class CctvSpider(scrapy.Spider):
                 artist = ''
                 if u'《' in item and u'》' in item:
                     title = item[item.find(u'《') + 1:item.find(u'》')]
-                    if u'：' in item:
-                        artist = item.split(u'：')[1]
+                    if u'演唱：' in item:
+                        artist = item.split(u'演唱：')[1]
                     if artist != '':
                         url = urls[titles.index(item)]
                         tracks.append({
