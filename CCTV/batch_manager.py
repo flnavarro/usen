@@ -87,7 +87,7 @@ class BatchManager(object):
             ['37 唱支山歌给党听', 'http://music.cctv.com/special/2017czsggdt/', '', 'WHOLE PAGE', 5, True],
             ['38 山水寄美端午情', 'http://ent.cctv.com/special/dw/index.shtml', '', 'WHOLE PAGE', 1, True],
             ['39 中国梦·劳动美2017', 'http://ent.cctv.com/special/xlx/index.shtml', '', 'WHOLE PAGE', 5, True],
-            ['40 2017春晚', 'http://chunwan.cctv.com/', '', 'WHOLE PAGE', 9, True],
+            ['40 2017春晚', 'http://chunwan.cctv.com/2017/', '', 'WHOLE PAGE', 9, True],
             ['41 美丽中国唱起来', 'http://tv.cctv.com/2017/01/19/VIDALucOxtJEnqZCSSJtV9WP170119.shtml', '', '精彩看点', 6, True],
             ['42 启航2017', 'http://music.cctv.com/special/qihang2017/index.shtml', '', 'WHOLE PAGE', 7, True],
             ['43 我和我的祖国2016', 'http://music.cctv.com/special/2016gq/index.shtml', '', 'WHOLE PAGE', 7, True],

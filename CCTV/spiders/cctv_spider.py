@@ -59,7 +59,7 @@ class CctvSpider(scrapy.Spider):
             ['37 唱支山歌给党听', 'http://music.cctv.com/special/2017czsggdt/', '', 'WHOLE PAGE', 5, True],
             ['38 山水寄美端午情', 'http://ent.cctv.com/special/dw/index.shtml', '', 'WHOLE PAGE', 1, True],
             ['39 中国梦·劳动美2017', 'http://ent.cctv.com/special/xlx/index.shtml', '', 'WHOLE PAGE', 5, True],
-            ['40 2017春晚', 'http://chunwan.cctv.com/', '', 'WHOLE PAGE', 9, True],
+            ['40 2017春晚', 'http://chunwan.cctv.com/2017/', '', 'WHOLE PAGE', 9, True],
             ['41 美丽中国唱起来', 'http://tv.cctv.com/2017/01/19/VIDALucOxtJEnqZCSSJtV9WP170119.shtml', '', '精彩看点', 6, True],
             ['42 启航2017', 'http://music.cctv.com/special/qihang2017/index.shtml', '', 'WHOLE PAGE', 7, True],
             ['43 我和我的祖国2016', 'http://music.cctv.com/special/2016gq/index.shtml', '', 'WHOLE PAGE', 7, True],
@@ -79,7 +79,9 @@ class CctvSpider(scrapy.Spider):
         ]
 
         # self.shows = [
-        #     ['29 2017年中秋晚会', 'http://tv.cctv.com/2017/09/21/VIDAuTggsVYiMmLnOgLnPKDB170921.shtml', '', '精彩看点', 6, True],
+        #     ['34 在党的旗帜下', 'http://tv.cctv.com/2017/08/01/VIDA9KMlXxaLT4axj4rOHwVO170801.shtml', '', '精彩看点', 6, True],
+        #     ['40 2017春晚', 'http://chunwan.cctv.com/2017/', '', 'WHOLE PAGE', 9, True],
+        #     ['52 2015春晚', 'http://chunwan.cntv.cn/2015/', '', 'WHOLE PAGE', 1, True],
         # ]
 
         self.first_execution = first_execution
@@ -142,6 +144,7 @@ class CctvSpider(scrapy.Spider):
         titles = []
         titles_3_raw = []
         urls = []
+        show_title = response.request.meta['show_title']
         if web_type == 1 or web_type == 2 or web_type == 11:
             titles = response.xpath(".//div[@class='image_list_box']//ul//div[@class='text']//a/text()").extract()
             urls = response.xpath(".//div[@class='image_list_box']//ul//div[@class='text']//a/@href").extract()
@@ -198,7 +201,12 @@ class CctvSpider(scrapy.Spider):
             artist = ''
             if u'《' in item and u'》' in item:
                 title = item[item.find(u'《') + 1:item.find(u'》')]
-                if (web_type == 1 or web_type == 5 or web_type == 6 or web_type == 7 or web_type == 8
+                if web_type == 1:
+                    if u'演唱：' in item and '52' not in show_title:
+                        artist = item.split(u'演唱：')[1]
+                    elif u'表演者：' in item and '52' in show_title:
+                        artist = item.split(u'表演者：')[1]
+                elif (web_type == 5 or web_type == 7 or web_type == 8
                         or web_type == 9 or web_type == 10) and u'演唱：' in item:
                     artist = item.split(u'演唱：')[1]
                 elif web_type == 2:
@@ -209,6 +217,11 @@ class CctvSpider(scrapy.Spider):
                         artist = titles_3_raw[t3_id][1].split(u'演唱：')[1]
                         if len(titles_3_raw[t3_id]) == 3:
                             artist += ' ' + titles_3_raw[t3_id][2]
+                elif web_type == 6:
+                    if u'演唱：' in item and '34' not in show_title:
+                        artist = item.split(u'演唱：')[1]
+                    elif u'领唱：' in item and '34' in show_title:
+                        artist = item.split(u'领唱：')[1]
                 elif web_type == 11 and u'表演者：' in item:
                     artist = item.split(u'表演者：')[1]
                 elif web_type == 12:
@@ -222,7 +235,6 @@ class CctvSpider(scrapy.Spider):
                         'index': idx
                     })
                     idx += 1
-        show_title = response.request.meta['show_title']
         self.save_list(tracks, show_title, 1)
 
     def parse(self, response):
