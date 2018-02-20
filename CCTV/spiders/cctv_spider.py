@@ -79,9 +79,8 @@ class CctvSpider(scrapy.Spider):
         ]
 
         # self.shows = [
-        #     ['34 在党的旗帜下', 'http://tv.cctv.com/2017/08/01/VIDA9KMlXxaLT4axj4rOHwVO170801.shtml', '', '精彩看点', 6, True],
-        #     ['40 2017春晚', 'http://chunwan.cctv.com/2017/', '', 'WHOLE PAGE', 9, True],
-        #     ['52 2015春晚', 'http://chunwan.cntv.cn/2015/', '', 'WHOLE PAGE', 1, True],
+        #     ['47 心连心艺术团慰问演出', 'C19548', '', '精彩片段', 13, False],
+        #     ['56 中国好歌曲', 'VSET100181076033', '', '精彩片段', 13, True],
         # ]
 
         self.first_execution = first_execution
@@ -311,16 +310,33 @@ class CctvSpider(scrapy.Spider):
             self.parse_single_page(response, web_type)
 
         elif web_type == 4 or web_type == 13:
-            titles = ''
-            urls = ''
+            titles = []
+            urls = []
             items_per_page = 1
             if web_type == 4:
                 titles = response.xpath("..//li//p//a/text()").extract()
                 urls = response.xpath("..//li//p//a/@href").extract()
                 items_per_page = 20
             elif web_type == 13:
-                titles = response.xpath(".//div[@class='md_bd']//div[@class='image_list']//h3//a/text()").extract()
-                urls = response.xpath(".//div[@class='md_bd']//div[@class='image_list']//h3//a/@href").extract()
+                titles_ = response.xpath(".//div[@class='md_bd']//div[@class='image_list']//h3//a/text()").extract()
+                for title_ in titles_:
+                    title_split = title_.split(' ')
+                    has_date = False
+                    for t_s in title_split:
+                        if t_s[:2] == str(20):
+                            has_date = True
+                    title = ''
+                    if has_date:
+                        title = ' '.join(title_split[:-1])
+                    else:
+                        title = title_
+                    titles.append(title)
+                urls_ = response.xpath(".//div[@class='md_bd']//div[@class='image_list']//h3//a/@href").extract()
+                for url_ in urls_:
+                    if url_[0] == '/':
+                        urls.append('http://tv.cntv.cn' + url_)
+                    else:
+                        urls.append(url_)
                 items_per_page = 12
 
             tracks = []

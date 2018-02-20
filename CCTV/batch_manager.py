@@ -105,9 +105,9 @@ class BatchManager(object):
             ['55 中国好歌曲第二季', 'http://tv.cctv.com/lm/zghgq2/videoset/', '', 'WHOLE PAGE', 1, True],
             ['56 中国好歌曲', 'VSET100181076033', '', '精彩片段', 13, True],
         ]
-
+        #
         # self.shows = [
-        #     ['01 全球中文音乐榜上榜', 'TOPC1451542061864640', 'Y2oSEQdYWBBlMZCIG7UF160128', '精彩看点', 0, False],
+        #     ['47 心连心艺术团慰问演出', 'C19548', '', '精彩片段', 13, False],
         # ]
 
     def open_global_log(self):
